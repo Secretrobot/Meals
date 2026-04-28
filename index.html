@@ -1,547 +1,505 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Meal Planner v5</title>
+
+<style>
+:root{
+  --bg:#f2f2f7;
+  --card:rgba(255,255,255,0.75);
+  --text:#1c1c1e;
+  --muted:#8e8e93;
+  --accent:#0a84ff;
+  --shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+body{
+  margin:0;
+  font-family:-apple-system, system-ui;
+  background:var(--bg);
+  color:var(--text);
+}
+
+/* HEADER */
+header{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  backdrop-filter: blur(20px);
+  background:rgba(255,255,255,0.7);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+button{
+  background:var(--accent);
+  border:none;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:10px;
+  font-weight:600;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  padding:12px;
+}
+
+.day{
+  background:var(--card);
+  backdrop-filter: blur(20px);
+  border-radius:18px;
+  padding:14px;
+  min-height:110px;
+  position:relative;
+  box-shadow:var(--shadow);
+  transition:transform .12s ease, opacity .2s ease;
+}
+
+.day:active{ transform:scale(0.98); }
+
+.day.locked{ opacity:0.6; }
+
+h4{
+  margin:0 0 6px 0;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.meal{ font-weight:600; }
+.side{ font-size:12px; color:var(--muted); }
+
+/* ICONS */
+.icons{
+  position:absolute;
+  top:8px;
+  right:8px;
+  display:flex;
+  gap:8px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter: blur(30px);
+  border-radius:24px 24px 0 0;
+  padding:14px;
+  max-height:75%;
+  overflow:auto;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.2,.8,.2,1);
+  box-shadow:0 -10px 40px rgba(0,0,0,0.2);
+}
+
+.modal.show{ transform:translateY(0); }
+
+.handle{
+  width:42px;
+  height:5px;
+  background:#d1d1d6;
+  border-radius:10px;
+  margin:6px auto 14px;
+}
+
+/* CHIPS */
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.chip{
+  padding:6px 10px;
+  border-radius:20px;
+  background:#e5e5ea;
+  font-size:12px;
+  user-select:none;
+}
+
+.chip.active{
+  background:var(--accent);
+  color:white;
+}
+
+/* SUGGESTIONS */
+.suggestion{
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.9);
+  margin-bottom:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.05);
+  font-weight:500;
+  transition:transform .12s ease;
+}
+
+.suggestion:active{ transform:scale(0.98); }
+
+.footer-actions{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  gap:8px;
+}
+
+.small-btn{
+  flex:1;
+  background:#e5e5ea;
+  color:#1c1c1e;
+}
+</style>
 </head>
+
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1">&lt;meta charset="UTF-8" /&gt;</p>
-<p class="p1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"/&gt;</p>
-<p class="p1">&lt;title&gt;Meal Planner v5&lt;/title&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;style&gt;</p>
-<p class="p1">:root{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--bg:#f2f2f7;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--card:rgba(255,255,255,0.75);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--text:#1c1c1e;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--muted:#8e8e93;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--accent:#0a84ff;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>--shadow:0 6px 20px rgba(0,0,0,0.08);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">body{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-family:-apple-system, system-ui;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:var(--bg);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:var(--text);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* HEADER */</p>
-<p class="p1">header{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>justify-content:space-between;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>backdrop-filter: blur(20px);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:rgba(255,255,255,0.7);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>position:sticky;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>top:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>z-index:10;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* BUTTON */</p>
-<p class="p1">button{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border:none;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:#fff;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:8px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-weight:600;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* GRID */</p>
-<p class="p1">.grid{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:grid;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>grid-template-columns:1fr 1fr;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>gap:12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:12px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.day{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:var(--card);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>backdrop-filter: blur(20px);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:18px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:14px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>min-height:110px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>position:relative;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>box-shadow:var(--shadow);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>transition:transform .12s ease, opacity .2s ease;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.day:active{ transform:scale(0.98); }</p>
-<p class="p2"><br></p>
-<p class="p1">.day.locked{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>opacity:0.6;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">h4{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin:0 0 6px 0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-size:13px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:var(--muted);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.meal{ font-weight:600; }</p>
-<p class="p1">.side{ font-size:12px; color:var(--muted); }</p>
-<p class="p2"><br></p>
-<p class="p1">/* ICONS */</p>
-<p class="p1">.icons{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>position:absolute;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>top:8px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>right:8px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>gap:8px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>opacity:0.8;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* MODAL */</p>
-<p class="p1">.modal{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>position:fixed;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>bottom:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>left:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>right:0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:rgba(255,255,255,0.82);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>backdrop-filter: blur(30px);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:24px 24px 0 0;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:14px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>max-height:75%;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>overflow:auto;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>transform:translateY(100%);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>transition:transform .28s cubic-bezier(.2,.8,.2,1);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>box-shadow:0 -10px 40px rgba(0,0,0,0.2);</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.modal.show{ transform:translateY(0); }</p>
-<p class="p2"><br></p>
-<p class="p1">.handle{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>width:42px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>height:5px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:#d1d1d6;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:10px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin:6px auto 14px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* CHIPS */</p>
-<p class="p1">.chips{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>flex-wrap:wrap;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>gap:6px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-bottom:12px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.chip{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:6px 10px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:20px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:#e5e5ea;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-size:12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>user-select:none;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.chip.active{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:var(--accent);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:white;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* SUGGESTIONS */</p>
-<p class="p1">.suggestion{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>padding:12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>border-radius:12px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:rgba(255,255,255,0.9);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-bottom:8px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>box-shadow:0 2px 10px rgba(0,0,0,0.05);</p>
-<p class="p1"><span class="Apple-converted-space">  </span>font-weight:500;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>transition:transform .12s ease;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.suggestion:active{ transform:scale(0.98); }</p>
-<p class="p2"><br></p>
-<p class="p1">/* FOOTER ACTIONS */</p>
-<p class="p1">.footer-actions{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>display:flex;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>justify-content:space-between;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>margin-top:10px;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>gap:8px;</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">.small-btn{</p>
-<p class="p1"><span class="Apple-converted-space">  </span>flex:1;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>background:#e5e5ea;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>color:#1c1c1e;</p>
-<p class="p1">}</p>
-<p class="p1">&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;header&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button onclick="autoPopulate()"&gt;Auto Plan&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;button onclick="exportData()"&gt;Export&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
-<p class="p1">&lt;/header&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="grid" class="grid"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;div id="modal" class="modal"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="handle"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="modalContent"&gt;&lt;/div&gt;</p>
-<p class="p1">&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>STATE MANAGER</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">const State = {</p>
-<p class="p1"><span class="Apple-converted-space">  </span>data:{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>week: Array(7).fill(null).map(()=&gt;({meal:null,locked:false})),</p>
-<p class="p1"><span class="Apple-converted-space">    </span>usage:{},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>likes:{},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>avoids:{},</p>
-<p class="p1"><span class="Apple-converted-space">    </span>filters:[]</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>async load(){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const saved = await Storage.get("state")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(saved) this.data = saved</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>async save(){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>await Storage.set("state", this.data)</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>STORAGE (IndexedDB)</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">const Storage = (()=&gt;{</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const DB_NAME="meal_planner_v5"</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const STORE="kv"</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const VERSION=1</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>let db</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>function open(){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return new Promise((res)=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const req=indexedDB.open(DB_NAME,VERSION)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>req.onupgradeneeded=e=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const db=e.target.result</p>
-<p class="p1"><span class="Apple-converted-space">        </span>db.createObjectStore(STORE)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>req.onsuccess=e=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">        </span>db=e.target.result</p>
-<p class="p1"><span class="Apple-converted-space">        </span>res()</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>async function get(key){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(!db) await open()</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return new Promise(r=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const tx=db.transaction(STORE,"readonly")</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const store=tx.objectStore(STORE)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const req=store.get(key)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>req.onsuccess=()=&gt;r(req.result)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>async function set(key,val){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(!db) await open()</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return new Promise(r=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const tx=db.transaction(STORE,"readwrite")</p>
-<p class="p1"><span class="Apple-converted-space">      </span>tx.objectStore(STORE).put(val,key)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>tx.oncomplete=()=&gt;r()</p>
-<p class="p1"><span class="Apple-converted-space">    </span>})</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>return {open,get,set}</p>
-<p class="p1">})()</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>MEAL DATA</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">const meals = [</p>
-<p class="p1">"Fried Rice","Noodle Bowl","Quesadilla","Pesto Pasta","Thai Curry",</p>
-<p class="p1">"Halloumi Wraps","Black Bean Rice","Stir Fry","Baked Potato",</p>
-<p class="p1">"Sunday Roast","Veggie Burgers","Grilled Cheese + Soup",</p>
-<p class="p1">"Chickpea Curry","Aloo Gobi","Falafel and Veg",</p>
-<p class="p1">"Shepherd's Pie","Sweet Potato Black Bean Tacos"</p>
-<p class="p1">]</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>RECOMMENDATION ENGINE</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">const Engine = {</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>score(meal, dayIndex){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const s = State.data</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>let score = 0</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const freq = s.usage[meal] || 0</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const liked = s.likes[meal] || 0</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const avoided = s.avoids[meal] || 0</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// frequency decay</p>
-<p class="p1"><span class="Apple-converted-space">    </span>score -= freq * 2</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// preference learning</p>
-<p class="p1"><span class="Apple-converted-space">    </span>score += liked * 3</p>
-<p class="p1"><span class="Apple-converted-space">    </span>score -= avoided * 6</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// weekly repetition penalty</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(s.week.some(d=&gt;d.meal===meal)) score -= 8</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// weekend bias</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(dayIndex&gt;=5){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if(meal.includes("Roast") || meal.includes("Pasta")) score += 2</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// quick/comfort heuristics</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(meal.includes("Burger") || meal.includes("Wrap")) score += 1</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(meal.includes("Cheese") || meal.includes("Curry")) score += 1</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>return score</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>pick(dayIndex){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const ranked = meals</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.map(m=&gt;({m,score:this.score(m,dayIndex)}))</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.sort((a,b)=&gt;b.score-a.score)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const top = ranked.slice(0,5)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>return top[Math.floor(Math.random()*top.length)].m</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>UX ENGINE (learning signals)</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">const Learn = {</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>select(meal){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const s = State.data</p>
-<p class="p1"><span class="Apple-converted-space">    </span>s.likes[meal] = (s.likes[meal]||0) + 1</p>
-<p class="p1"><span class="Apple-converted-space">    </span>s.usage[meal] = (s.usage[meal]||0) + 1</p>
-<p class="p1"><span class="Apple-converted-space">  </span>},</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>reroll(meal){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const s = State.data</p>
-<p class="p1"><span class="Apple-converted-space">    </span>s.avoids[meal] = (s.avoids[meal]||0) + 1</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>UI</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">let activeDay=null</p>
-<p class="p2"><br></p>
-<p class="p1">function render(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const grid=document.getElementById("grid")</p>
-<p class="p1"><span class="Apple-converted-space">  </span>grid.innerHTML=""</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week.forEach((d,i)=&gt;{</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const el=document.createElement("div")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>el.className="day" + (d.locked?" locked":"")</p>
-<p class="p1"><span class="Apple-converted-space">    </span>el.onclick=()=&gt;openModal(i)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>el.innerHTML=`</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;h4&gt;Day ${i+1}&lt;/h4&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="meal"&gt;${d.meal||""}&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="icons"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="reroll(${i});event.stopPropagation()"&gt;↻&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="toggleLock(${i});event.stopPropagation()"&gt;🔒&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>grid.appendChild(el)</p>
-<p class="p1"><span class="Apple-converted-space">  </span>})</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function openModal(i){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>activeDay=i</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const modal=document.getElementById("modal")</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const content=document.getElementById("modalContent")</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const suggestions = getSuggestions(i)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>content.innerHTML=`</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="chips"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>${["Comfort","Quick","Italian","Asian","Mexican"].map(f=&gt;`</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="chip ${State.data.filters.includes(f)?"active":""}"</p>
-<p class="p1"><span class="Apple-converted-space">             </span>onclick="toggleFilter('${f}')"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">          </span>${f}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>`).join("")}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>${suggestions.map(m=&gt;`</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="suggestion" onclick="selectMeal('${m}')"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>${m}</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>`).join("")}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="footer-actions"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="small-btn" onclick="clearDay()"&gt;Clear&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="small-btn" onclick="closeModal()"&gt;Done&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>modal.classList.add("show")</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function getSuggestions(i){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>let pool = meals</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const filters = State.data.filters</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(filters.length){</p>
-<p class="p1"><span class="Apple-converted-space">    </span>pool = pool.filter(m=&gt;filters.some(f=&gt;m.includes(f)))</p>
-<p class="p1"><span class="Apple-converted-space">  </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>return pool</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.map(m=&gt;({m,score:Engine.score(m,i)}))</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.sort((a,b)=&gt;b.score-a.score)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.slice(0,6)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.map(x=&gt;x.m)</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>ACTIONS</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">async function autoPopulate(){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week.forEach((d,i)=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>if(!d.locked &amp;&amp; !d.meal){</p>
-<p class="p1"><span class="Apple-converted-space">      </span>d.meal = Engine.pick(i)</p>
-<p class="p1"><span class="Apple-converted-space">      </span>Learn.select(d.meal)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>})</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>await State.save()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">async function selectMeal(m){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week[activeDay].meal=m</p>
-<p class="p1"><span class="Apple-converted-space">  </span>Learn.select(m)</p>
-<p class="p1"><span class="Apple-converted-space">  </span>await State.save()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>closeModal()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">async function reroll(i){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const old = State.data.week[i].meal</p>
-<p class="p1"><span class="Apple-converted-space">  </span>if(old) Learn.reroll(old)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week[i].meal = Engine.pick(i)</p>
-<p class="p1"><span class="Apple-converted-space">  </span>await State.save()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">async function clearDay(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week[activeDay]={meal:null,locked:false}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>await State.save()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>closeModal()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function toggleLock(i){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.data.week[i].locked=!State.data.week[i].locked</p>
-<p class="p1"><span class="Apple-converted-space">  </span>State.save()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">function toggleFilter(f){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const s=State.data</p>
-<p class="p1"><span class="Apple-converted-space">  </span>s.filters = s.filters.includes(f)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>? s.filters.filter(x=&gt;x!==f)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>: [...s.filters,f]</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>openModal(activeDay)</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>MODAL</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">function closeModal(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>document.getElementById("modal").classList.remove("show")</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>PWA BASICS</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">function registerPWA(){</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const sw = `</p>
-<p class="p1"><span class="Apple-converted-space">  </span>self.addEventListener('install',e=&gt;{</p>
-<p class="p1"><span class="Apple-converted-space">    </span>self.skipWaiting()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>})</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>self.addEventListener('fetch',()=&gt;{})</p>
-<p class="p1"><span class="Apple-converted-space">  </span>`</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const blob = new Blob([sw],{type:'text/javascript'})</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const url = URL.createObjectURL(blob)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>navigator.serviceWorker?.register(url)</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>EXPORT / IMPORT</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">function exportData(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>const blob = new Blob(</p>
-<p class="p1"><span class="Apple-converted-space">    </span>[JSON.stringify(State.data)],</p>
-<p class="p1"><span class="Apple-converted-space">    </span>{type:"application/json"}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>)</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>const a=document.createElement("a")</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.href=URL.createObjectURL(blob)</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.download="meal-plan-backup.json"</p>
-<p class="p1"><span class="Apple-converted-space">  </span>a.click()</p>
-<p class="p1">}</p>
-<p class="p2"><br></p>
-<p class="p1">/* =========================</p>
-<p class="p1"><span class="Apple-converted-space">   </span>INIT</p>
-<p class="p1">========================= */</p>
-<p class="p2"><br></p>
-<p class="p1">(async function init(){</p>
-<p class="p1"><span class="Apple-converted-space">  </span>await Storage.open()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>await State.load()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>render()</p>
-<p class="p1"><span class="Apple-converted-space">  </span>registerPWA()</p>
-<p class="p1">})()</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+<header>
+  <button onclick="autoPopulate()">Auto Plan</button>
+  <button onclick="exportData()">Export</button>
+</header>
+
+<div id="grid" class="grid"></div>
+
+<div id="modal" class="modal">
+  <div class="handle"></div>
+  <div id="modalContent"></div>
+</div>
+
+<script>
+
+/* =========================
+   STATE
+========================= */
+
+const State = {
+  data:{
+    week: Array(7).fill(null).map(()=>({meal:null,locked:false})),
+    usage:{},
+    likes:{},
+    avoids:{},
+    filters:[]
+  },
+
+  async load(){
+    const saved = await Storage.get("state")
+    if(saved) this.data = saved
+  },
+
+  async save(){
+    await Storage.set("state", this.data)
+  }
+}
+
+/* =========================
+   STORAGE (IndexedDB)
+========================= */
+
+const Storage = (()=>{
+
+  const DB_NAME="meal_planner_v5"
+  const STORE="kv"
+  const VERSION=1
+
+  let db
+
+  function open(){
+    return new Promise((res)=>{
+      const req=indexedDB.open(DB_NAME,VERSION)
+
+      req.onupgradeneeded=e=>{
+        const db=e.target.result
+        db.createObjectStore(STORE)
+      }
+
+      req.onsuccess=e=>{
+        db=e.target.result
+        res()
+      }
+    })
+  }
+
+  async function get(key){
+    if(!db) await open()
+    return new Promise(r=>{
+      const tx=db.transaction(STORE,"readonly")
+      const store=tx.objectStore(STORE)
+      const req=store.get(key)
+      req.onsuccess=()=>r(req.result)
+    })
+  }
+
+  async function set(key,val){
+    if(!db) await open()
+    return new Promise(r=>{
+      const tx=db.transaction(STORE,"readwrite")
+      tx.objectStore(STORE).put(val,key)
+      tx.oncomplete=()=>r()
+    })
+  }
+
+  return {open,get,set}
+})()
+
+/* =========================
+   DATA
+========================= */
+
+const meals = [
+"Fried Rice","Noodle Bowl","Quesadilla","Pesto Pasta","Thai Curry",
+"Halloumi Wraps","Black Bean Rice","Stir Fry","Baked Potato",
+"Sunday Roast","Veggie Burgers","Grilled Cheese + Soup",
+"Chickpea Curry","Aloo Gobi","Falafel and Veg",
+"Shepherd's Pie","Sweet Potato Black Bean Tacos"
+]
+
+/* =========================
+   ENGINE
+========================= */
+
+const Engine = {
+
+  score(meal, dayIndex){
+
+    const s = State.data
+    let score = 0
+
+    const freq = s.usage[meal] || 0
+    const liked = s.likes[meal] || 0
+    const avoided = s.avoids[meal] || 0
+
+    score -= freq * 2
+    score += liked * 3
+    score -= avoided * 6
+
+    if(s.week.some(d=>d.meal===meal)) score -= 8
+
+    if(dayIndex>=5){
+      if(meal.includes("Roast") || meal.includes("Pasta")) score += 2
+    }
+
+    if(meal.includes("Burger") || meal.includes("Wrap")) score += 1
+    if(meal.includes("Cheese") || meal.includes("Curry")) score += 1
+
+    return score
+  },
+
+  pick(dayIndex){
+    const ranked = meals
+      .map(m=>({m,score:this.score(m,dayIndex)}))
+      .sort((a,b)=>b.score-a.score)
+
+    const top = ranked.slice(0,5)
+    return top[Math.floor(Math.random()*top.length)].m
+  }
+}
+
+/* =========================
+   LEARNING
+========================= */
+
+const Learn = {
+
+  select(meal){
+    const s = State.data
+    s.likes[meal] = (s.likes[meal]||0)+1
+    s.usage[meal] = (s.usage[meal]||0)+1
+  },
+
+  reroll(meal){
+    const s = State.data
+    s.avoids[meal] = (s.avoids[meal]||0)+1
+  }
+}
+
+/* =========================
+   UI
+========================= */
+
+let activeDay=null
+
+function render(){
+  const grid=document.getElementById("grid")
+  grid.innerHTML=""
+
+  State.data.week.forEach((d,i)=>{
+
+    const el=document.createElement("div")
+    el.className="day" + (d.locked?" locked":"")
+    el.onclick=()=>openModal(i)
+
+    el.innerHTML=`
+      <h4>Day ${i+1}</h4>
+      <div class="meal">${d.meal||""}</div>
+      <div class="icons">
+        <button onclick="reroll(${i});event.stopPropagation()">↻</button>
+        <button onclick="toggleLock(${i});event.stopPropagation()">🔒</button>
+      </div>
+    `
+
+    grid.appendChild(el)
+  })
+}
+
+function openModal(i){
+  activeDay=i
+
+  const content=document.getElementById("modalContent")
+
+  const suggestions = getSuggestions(i)
+
+  content.innerHTML=`
+    <div class="chips">
+      ${["Comfort","Quick","Italian","Asian","Mexican"].map(f=>`
+        <div class="chip ${State.data.filters.includes(f)?"active":""}"
+             onclick="toggleFilter('${f}')">
+          ${f}
+        </div>
+      `).join("")}
+    </div>
+
+    ${suggestions.map(m=>`
+      <div class="suggestion" onclick="selectMeal('${m}')">
+        ${m}
+      </div>
+    `).join("")}
+
+    <div class="footer-actions">
+      <button class="small-btn" onclick="clearDay()">Clear</button>
+      <button class="small-btn" onclick="closeModal()">Done</button>
+    </div>
+  `
+
+  document.getElementById("modal").classList.add("show")
+}
+
+function getSuggestions(i){
+
+  let pool = meals
+
+  const filters = State.data.filters
+  if(filters.length){
+    pool = pool.filter(m=>filters.some(f=>m.includes(f)))
+  }
+
+  return pool
+    .map(m=>({m,score:Engine.score(m,i)}))
+    .sort((a,b)=>b.score-a.score)
+    .slice(0,6)
+    .map(x=>x.m)
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+async function autoPopulate(){
+  State.data.week.forEach((d,i)=>{
+    if(!d.locked && !d.meal){
+      d.meal = Engine.pick(i)
+      Learn.select(d.meal)
+    }
+  })
+
+  await State.save()
+  render()
+}
+
+async function selectMeal(m){
+  State.data.week[activeDay].meal=m
+  Learn.select(m)
+  await State.save()
+  closeModal()
+  render()
+}
+
+async function reroll(i){
+  const old = State.data.week[i].meal
+  if(old) Learn.reroll(old)
+
+  State.data.week[i].meal = Engine.pick(i)
+  await State.save()
+  render()
+}
+
+async function clearDay(){
+  State.data.week[activeDay]={meal:null,locked:false}
+  await State.save()
+  closeModal()
+  render()
+}
+
+function toggleLock(i){
+  State.data.week[i].locked=!State.data.week[i].locked
+  State.save()
+  render()
+}
+
+function toggleFilter(f){
+  const s=State.data
+  s.filters = s.filters.includes(f)
+    ? s.filters.filter(x=>x!==f)
+    : [...s.filters,f]
+
+  openModal(activeDay)
+}
+
+/* =========================
+   MODAL
+========================= */
+
+function closeModal(){
+  document.getElementById("modal").classList.remove("show")
+}
+
+/* =========================
+   EXPORT
+========================= */
+
+function exportData(){
+  const blob = new Blob(
+    [JSON.stringify(State.data)],
+    {type:"application/json"}
+  )
+
+  const a=document.createElement("a")
+  a.href=URL.createObjectURL(blob)
+  a.download="meal-plan-backup.json"
+  a.click()
+}
+
+/* =========================
+   FIXED PWA (IMPORTANT CHANGE)
+   - removed blob service worker (was breaking GitHub Pages)
+========================= */
+
+function registerPWA(){
+  if(!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker.register('./sw.js')
+    .catch(err=>console.log('SW failed',err))
+}
+
+/* =========================
+   INIT
+========================= */
+
+(async function init(){
+  await Storage.open()
+  await State.load()
+  render()
+  registerPWA()
+})()
+
+</script>
+
 </body>
 </html>
