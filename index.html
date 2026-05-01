@@ -2,504 +2,1617 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Meal Planner v5</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meal Planner</title>
 
 <style>
-:root{
-  --bg:#f2f2f7;
-  --card:rgba(255,255,255,0.75);
-  --text:#1c1c1e;
-  --muted:#8e8e93;
-  --accent:#0a84ff;
-  --shadow:0 6px 20px rgba(0,0,0,0.08);
+:root {
+  --bg: #5aa7a7;
+  --surface: #ffffff;
+  --surface-soft: #edf9f4;
+  --surface-strong: #cdebe1;
+  --text: #163738;
+  --muted: #607a7c;
+  --border: #96d7c6;
+  --accent: #5aa7a7;
+  --accent-strong: #3f8587;
+  --green: #7d9f34;
+  --amber: #a79821;
+  --danger: #b42318;
+  --leaf: #4b8f8f;
+  --sky: #6c8cbf;
+  --lime: #bac94a;
+  --butter: #e2d56b;
+  --button-bg: #e2d56b;
+  --button-hover: #d5c957;
+  --button-border: #8d842a;
+  --button-text: #35411c;
+  --shadow: 0 8px 24px rgba(22, 55, 56, 0.1);
 }
 
-body{
-  margin:0;
-  font-family:-apple-system, system-ui;
-  background:var(--bg);
-  color:var(--text);
+* {
+  box-sizing: border-box;
 }
 
-/* HEADER */
-header{
-  display:flex;
-  justify-content:space-between;
-  padding:12px;
-  backdrop-filter: blur(20px);
-  background:rgba(255,255,255,0.7);
-  position:sticky;
-  top:0;
-  z-index:10;
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background:
+    radial-gradient(circle at 17% 22%, rgba(255, 255, 255, 0.12) 0 0.8px, transparent 1.15px),
+    radial-gradient(circle at 68% 73%, rgba(43, 105, 102, 0.14) 0 0.9px, transparent 1.25px),
+    radial-gradient(circle at 34% 88%, rgba(226, 213, 107, 0.12) 0 0.75px, transparent 1.15px),
+    radial-gradient(circle at 82% 19%, rgba(186, 201, 74, 0.12) 0 0.65px, transparent 1px),
+    radial-gradient(circle at 43% 48%, rgba(108, 140, 191, 0.08) 0 0.55px, transparent 0.9px),
+    linear-gradient(135deg, #96d7c6 0%, #5aa7a7 42%, #6c8cbf 100%);
+  background-size: 18px 18px, 23px 23px, 15px 15px, 31px 31px, 11px 11px, auto;
+  color: var(--text);
 }
 
-button{
-  background:var(--accent);
-  border:none;
-  color:#fff;
-  padding:8px 12px;
-  border-radius:10px;
-  font-weight:600;
+body.modal-open {
+  overflow: hidden;
 }
 
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  padding:12px;
+button {
+  border: 0;
+  font: inherit;
 }
 
-.day{
-  background:var(--card);
-  backdrop-filter: blur(20px);
-  border-radius:18px;
-  padding:14px;
-  min-height:110px;
-  position:relative;
-  box-shadow:var(--shadow);
-  transition:transform .12s ease, opacity .2s ease;
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(10, 102, 209, 0.28);
+  outline-offset: 2px;
 }
 
-.day:active{ transform:scale(0.98); }
-
-.day.locked{ opacity:0.6; }
-
-h4{
-  margin:0 0 6px 0;
-  font-size:13px;
-  color:var(--muted);
+.icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 
-.meal{ font-weight:600; }
-.side{ font-size:12px; color:var(--muted); }
-
-/* ICONS */
-.icons{
-  position:absolute;
-  top:8px;
-  right:8px;
-  display:flex;
-  gap:8px;
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(90, 167, 167, 0.36);
+  background: rgba(237, 249, 244, 0.84);
+  backdrop-filter: blur(18px);
 }
 
-/* MODAL */
-.modal{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:rgba(255,255,255,0.82);
-  backdrop-filter: blur(30px);
-  border-radius:24px 24px 0 0;
-  padding:14px;
-  max-height:75%;
-  overflow:auto;
-  transform:translateY(100%);
-  transition:transform .28s cubic-bezier(.2,.8,.2,1);
-  box-shadow:0 -10px 40px rgba(0,0,0,0.2);
+.title-block {
+  min-width: 0;
 }
 
-.modal.show{ transform:translateY(0); }
-
-.handle{
-  width:42px;
-  height:5px;
-  background:#d1d1d6;
-  border-radius:10px;
-  margin:6px auto 14px;
+.eyebrow {
+  margin: 0 0 2px;
+  color: var(--leaf);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-/* CHIPS */
-.chips{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
-  margin-bottom:12px;
+h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
-.chip{
-  padding:6px 10px;
-  border-radius:20px;
-  background:#e5e5ea;
-  font-size:12px;
-  user-select:none;
+.header-actions,
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.chip.active{
-  background:var(--accent);
-  color:white;
+.button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 2px 0 rgba(72, 45, 24, 0.22);
 }
 
-/* SUGGESTIONS */
-.suggestion{
-  padding:12px;
-  border-radius:12px;
-  background:rgba(255,255,255,0.9);
-  margin-bottom:8px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.05);
-  font-weight:500;
-  transition:transform .12s ease;
+.button:hover {
+  background: var(--button-hover);
 }
 
-.suggestion:active{ transform:scale(0.98); }
-
-.footer-actions{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-  gap:8px;
+.button.secondary {
+  border-color: var(--button-border);
+  background: #f1e89c;
+  color: var(--button-text);
 }
 
-.small-btn{
-  flex:1;
-  background:#e5e5ea;
-  color:#1c1c1e;
+.button.secondary:hover {
+  background: var(--button-hover);
+}
+
+.button.danger {
+  border-color: rgba(180, 35, 24, 0.22);
+  background: #fff7f6;
+  color: var(--danger);
+}
+
+.button.danger:hover {
+  background: #ffe7e3;
+}
+
+.icon-button {
+  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--button-border);
+  background: var(--button-bg);
+  color: var(--button-text);
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 2px 0 rgba(72, 45, 24, 0.2);
+}
+
+.icon-button:hover {
+  background: var(--button-hover);
+}
+
+.icon-button[aria-pressed="true"] {
+  border-color: #7d9f34;
+  background: var(--lime);
+  color: #263816;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+main {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 14px 12px 24px;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 2px 14px;
+}
+
+.summary-row strong {
+  display: block;
+  font-size: 15px;
+}
+
+.summary-row span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.plan-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-position {
+  min-width: 78px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr));
+  gap: 12px;
+}
+
+.day {
+  display: flex;
+  min-height: 174px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.day.locked {
+  border-color: rgba(186, 201, 74, 0.72);
+  background: linear-gradient(0deg, rgba(186, 201, 74, 0.11), rgba(186, 201, 74, 0.11)), var(--surface);
+}
+
+.day-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.day h2 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.day-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.day-actions .icon-button {
+  width: 44px;
+  height: 44px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--leaf);
+}
+
+.day-actions .icon-button:hover {
+  background: rgba(150, 215, 198, 0.2);
+}
+
+.day-actions .icon-button[aria-pressed="true"] {
+  border-color: transparent;
+  background: transparent;
+  color: #657c1f;
+}
+
+.day-actions .icon-button[aria-pressed="true"]:hover {
+  background: rgba(186, 201, 74, 0.2);
+}
+
+.day-main {
+  display: flex;
+  min-height: 82px;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.day-main:hover {
+  border-color: var(--border);
+  background: var(--surface-soft);
+}
+
+.meal-title {
+  overflow-wrap: anywhere;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.side {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.empty-state .icon {
+  color: var(--accent);
+}
+
+.tag-row {
+  display: flex;
+  min-height: 24px;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tag {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--leaf);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.tag.locked-tag {
+  background: rgba(186, 201, 74, 0.2);
+  color: #657c1f;
+}
+
+.tag.planned-tag {
+  background: rgba(108, 140, 191, 0.16);
+  color: var(--sky);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  align-items: end;
+  background: rgba(22, 55, 56, 0.34);
+}
+
+.backdrop[hidden] {
+  display: none;
+}
+
+.modal {
+  width: 100%;
+  max-height: min(78vh, 720px);
+  overflow: auto;
+  padding: 10px 14px 14px;
+  border-radius: 16px 16px 0 0;
+  background: rgba(252, 255, 253, 0.97);
+  box-shadow: 0 -14px 38px rgba(22, 55, 56, 0.22);
+  transform: translateY(100%);
+  transition: transform 180ms ease;
+}
+
+.backdrop.show .modal {
+  transform: translateY(0);
+}
+
+.handle {
+  width: 42px;
+  height: 5px;
+  margin: 4px auto 12px;
+  border-radius: 999px;
+  background: #96d7c6;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sheet-kicker {
+  margin: 0 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sheet-header h2 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 12px;
+}
+
+.chip {
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--button-border);
+  background: #f1e89c;
+  color: var(--button-text);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chip[aria-pressed="true"] {
+  border-color: #7d9f34;
+  background: var(--lime);
+  color: #263816;
+}
+
+.suggestion-list {
+  display: grid;
+  gap: 8px;
+}
+
+.suggestion {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.suggestion:hover {
+  background: var(--surface-soft);
+}
+
+.suggestion-name {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.suggestion-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.empty-results,
+.locked-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+}
+
+.empty-results {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.locked-panel .icon {
+  color: var(--green);
+}
+
+.locked-panel strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.locked-panel span,
+.empty-results span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer-actions {
+  position: sticky;
+  bottom: -14px;
+  margin: 14px -14px -14px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--border);
+  background: rgba(252, 255, 253, 0.95);
+  backdrop-filter: blur(14px);
+}
+
+.footer-actions .button {
+  flex: 1;
+}
+
+.toast {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 40;
+  display: flex;
+  max-width: min(420px, calc(100vw - 24px));
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 10px 28px rgba(22, 55, 56, 0.18);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.toast button {
+  min-height: 32px;
+  padding: 6px 9px;
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .modal {
+    justify-self: center;
+    max-width: 720px;
+    border-radius: 16px 16px 0 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .header-actions .button {
+    flex: 1 1 142px;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .plan-nav {
+    width: 100%;
+  }
+
+  .plan-nav .button {
+    flex: 1;
+  }
 }
 </style>
 </head>
 
 <body>
-
-<header>
-  <button onclick="autoPopulate()">Auto Plan</button>
-  <button onclick="exportData()">Export</button>
+<header class="app-header">
+  <div class="title-block">
+    <p class="eyebrow">7-day cycle</p>
+    <h1>Meal Planner</h1>
+  </div>
+  <div class="header-actions" aria-label="Meal plan actions">
+    <button id="fillEmptyBtn" class="button" type="button"></button>
+    <button id="regenerateBtn" class="button secondary" type="button"></button>
+    <button id="importBtn" class="icon-button" type="button" aria-label="Import backup" title="Import backup"></button>
+    <button id="exportBtn" class="icon-button" type="button" aria-label="Export backup" title="Export backup"></button>
+  </div>
 </header>
 
-<div id="grid" class="grid"></div>
+<main>
+  <section class="summary-row" aria-live="polite">
+    <div>
+      <strong id="summaryCount">0 of 7 planned</strong>
+      <span id="summaryDetail">Ready to plan</span>
+    </div>
+    <div class="plan-nav" aria-label="Plan navigation">
+      <button id="prevPlanBtn" class="icon-button" type="button" aria-label="Previous plan" title="Previous plan"></button>
+      <span id="planPosition" class="plan-position">Plan 1 of 1</span>
+      <button id="nextPlanBtn" class="button secondary" type="button"></button>
+    </div>
+  </section>
 
-<div id="modal" class="modal">
-  <div class="handle"></div>
-  <div id="modalContent"></div>
+  <div id="grid" class="grid" aria-label="Weekly meal plan"></div>
+</main>
+
+<input id="importInput" type="file" accept="application/json,.json" hidden />
+
+<div id="backdrop" class="backdrop" hidden>
+  <section id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden>
+  <span id="toastMessage"></span>
+  <button id="undoBtn" class="button secondary" type="button">Undo</button>
 </div>
 
 <script>
+const DAYS = [
+  { short: "Day 1", long: "Day 1" },
+  { short: "Day 2", long: "Day 2" },
+  { short: "Day 3", long: "Day 3" },
+  { short: "Day 4", long: "Day 4" },
+  { short: "Day 5", long: "Day 5" },
+  { short: "Day 6", long: "Day 6" },
+  { short: "Day 7", long: "Day 7" }
+];
 
-/* =========================
-   STATE
-========================= */
+const FILTERS = ["Comfort", "Quick", "Italian", "Asian", "Mexican"];
+
+const MEAL_CATALOG = [
+  { name: "Fried Rice", tags: ["Asian", "Quick"], details: "25 min / stovetop" },
+  { name: "Noodle Bowl", tags: ["Asian", "Quick"], details: "20 min / adaptable" },
+  { name: "Quesadilla", tags: ["Mexican", "Quick", "Comfort"], details: "15 min / skillet" },
+  { name: "Pesto Pasta", tags: ["Italian", "Quick", "Comfort"], details: "20 min / vegetarian" },
+  { name: "Thai Curry", tags: ["Asian", "Comfort"], details: "35 min / one pot" },
+  { name: "Halloumi Wraps", tags: ["Quick", "Comfort"], details: "20 min / fresh" },
+  { name: "Black Bean Rice", tags: ["Mexican", "Quick"], details: "25 min / pantry" },
+  { name: "Stir Fry", tags: ["Asian", "Quick"], details: "20 min / high veg" },
+  { name: "Baked Potato", tags: ["Comfort", "Quick"], details: "50 min / hands-off" },
+  { name: "Sunday Roast", tags: ["Comfort"], details: "75 min / weekend" },
+  { name: "Veggie Burgers", tags: ["Comfort", "Quick"], details: "30 min / freezer-friendly" },
+  { name: "Grilled Cheese + Soup", tags: ["Comfort", "Quick"], details: "20 min / comfort" },
+  { name: "Chickpea Curry", tags: ["Comfort", "Quick"], details: "30 min / one pot" },
+  { name: "Aloo Gobi", tags: ["Asian", "Comfort"], details: "35 min / vegetarian" },
+  { name: "Falafel and Veg", tags: ["Quick"], details: "25 min / tray bake" },
+  { name: "Shepherd's Pie", tags: ["Comfort"], details: "60 min / batch cook" },
+  { name: "Sweet Potato Black Bean Tacos", tags: ["Mexican", "Comfort"], details: "35 min / filling" }
+];
+
+const MEAL_BY_NAME = new Map(MEAL_CATALOG.map((meal) => [meal.name, meal]));
+
+const ICONS = {
+  plus: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+  refresh: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>',
+  lock: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  unlock: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>',
+  close: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+  download: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>',
+  upload: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V9"/><path d="m7 14 5-5 5 5"/><path d="M5 3h14"/></svg>',
+  trash: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 15H6L5 6"/></svg>',
+  check: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m20 6-11 11-5-5"/></svg>',
+  chevronLeft: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>',
+  chevronRight: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>'
+};
 
 const State = {
-  data:{
-    week: Array(7).fill(null).map(()=>({meal:null,locked:false})),
-    usage:{},
-    likes:{},
-    avoids:{},
-    filters:[]
+  data: {
+    plans: [createPlan()],
+    currentPlanIndex: 0,
+    usage: {},
+    likes: {},
+    avoids: {},
+    filters: []
   },
 
-  async load(){
-    const saved = await Storage.get("state")
-    if(saved) this.data = saved
+  async load() {
+    const saved = await Storage.get("state");
+    this.data = normalizeState(saved);
   },
 
-  async save(){
-    await Storage.set("state", this.data)
+  async save() {
+    await Storage.set("state", this.data);
   }
-}
+};
 
-/* =========================
-   STORAGE (IndexedDB)
-========================= */
+const Storage = (() => {
+  const DB_NAME = "meal_planner_v5";
+  const STORE = "kv";
+  const VERSION = 1;
+  const FALLBACK_PREFIX = "meal_planner_v5:";
+  let db;
 
-const Storage = (()=>{
+  function open() {
+    if (db) return Promise.resolve();
+    if (!("indexedDB" in window)) return Promise.reject(new Error("IndexedDB unavailable"));
 
-  const DB_NAME="meal_planner_v5"
-  const STORE="kv"
-  const VERSION=1
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, VERSION);
 
-  let db
+      req.onupgradeneeded = (event) => {
+        const nextDb = event.target.result;
+        if (!nextDb.objectStoreNames.contains(STORE)) {
+          nextDb.createObjectStore(STORE);
+        }
+      };
 
-  function open(){
-    return new Promise((res)=>{
-      const req=indexedDB.open(DB_NAME,VERSION)
+      req.onsuccess = (event) => {
+        db = event.target.result;
+        resolve();
+      };
 
-      req.onupgradeneeded=e=>{
-        const db=e.target.result
-        db.createObjectStore(STORE)
-      }
-
-      req.onsuccess=e=>{
-        db=e.target.result
-        res()
-      }
-    })
-  }
-
-  async function get(key){
-    if(!db) await open()
-    return new Promise(r=>{
-      const tx=db.transaction(STORE,"readonly")
-      const store=tx.objectStore(STORE)
-      const req=store.get(key)
-      req.onsuccess=()=>r(req.result)
-    })
+      req.onerror = () => reject(req.error);
+    });
   }
 
-  async function set(key,val){
-    if(!db) await open()
-    return new Promise(r=>{
-      const tx=db.transaction(STORE,"readwrite")
-      tx.objectStore(STORE).put(val,key)
-      tx.oncomplete=()=>r()
-    })
+  function getFallback(key) {
+    try {
+      const raw = localStorage.getItem(FALLBACK_PREFIX + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      console.warn("Local storage read failed", error);
+      return null;
+    }
   }
 
-  return {open,get,set}
-})()
+  function setFallback(key, value) {
+    try {
+      localStorage.setItem(FALLBACK_PREFIX + key, JSON.stringify(value));
+    } catch (error) {
+      console.warn("Local storage write failed", error);
+    }
+  }
 
-/* =========================
-   DATA
-========================= */
+  async function get(key) {
+    try {
+      await open();
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readonly");
+        const store = tx.objectStore(STORE);
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (error) {
+      return getFallback(key);
+    }
+  }
 
-const meals = [
-"Fried Rice","Noodle Bowl","Quesadilla","Pesto Pasta","Thai Curry",
-"Halloumi Wraps","Black Bean Rice","Stir Fry","Baked Potato",
-"Sunday Roast","Veggie Burgers","Grilled Cheese + Soup",
-"Chickpea Curry","Aloo Gobi","Falafel and Veg",
-"Shepherd's Pie","Sweet Potato Black Bean Tacos"
-]
+  async function set(key, value) {
+    try {
+      await open();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE, "readwrite");
+        tx.objectStore(STORE).put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (error) {
+      setFallback(key, value);
+    }
+  }
 
-/* =========================
-   ENGINE
-========================= */
+  return { get, set };
+})();
 
 const Engine = {
+  score(meal, dayIndex) {
+    const data = State.data;
+    const name = meal.name;
+    let score = 0;
 
-  score(meal, dayIndex){
+    score -= (data.usage[name] || 0) * 2;
+    score += (data.likes[name] || 0) * 3;
+    score -= (data.avoids[name] || 0) * 6;
 
-    const s = State.data
-    let score = 0
-
-    const freq = s.usage[meal] || 0
-    const liked = s.likes[meal] || 0
-    const avoided = s.avoids[meal] || 0
-
-    score -= freq * 2
-    score += liked * 3
-    score -= avoided * 6
-
-    if(s.week.some(d=>d.meal===meal)) score -= 8
-
-    if(dayIndex>=5){
-      if(meal.includes("Roast") || meal.includes("Pasta")) score += 2
+    if (currentWeek().some((day, index) => index !== dayIndex && day.meal === name)) {
+      score -= 12;
     }
 
-    if(meal.includes("Burger") || meal.includes("Wrap")) score += 1
-    if(meal.includes("Cheese") || meal.includes("Curry")) score += 1
+    if (dayIndex < 5 && meal.tags.includes("Quick")) score += 2;
+    if (dayIndex >= 5 && meal.tags.includes("Comfort")) score += 2;
+    if (name.includes("Roast") || name.includes("Pasta")) score += dayIndex >= 5 ? 2 : 0;
+    if (meal.tags.includes("Mexican") || meal.tags.includes("Asian")) score += 1;
 
-    return score
+    return score;
   },
 
-  pick(dayIndex){
-    const ranked = meals
-      .map(m=>({m,score:this.score(m,dayIndex)}))
-      .sort((a,b)=>b.score-a.score)
+  pick(dayIndex, blockedNames = []) {
+    const blocked = new Set(blockedNames.filter(Boolean));
+    const planned = new Set(
+      currentWeek()
+        .filter((day, index) => index !== dayIndex && day.meal)
+        .map((day) => day.meal)
+    );
 
-    const top = ranked.slice(0,5)
-    return top[Math.floor(Math.random()*top.length)].m
+    let pool = MEAL_CATALOG.filter((meal) => !planned.has(meal.name) && !blocked.has(meal.name));
+    if (!pool.length) pool = MEAL_CATALOG.filter((meal) => !blocked.has(meal.name));
+    if (!pool.length) pool = MEAL_CATALOG;
+
+    const ranked = pool
+      .map((meal) => ({ meal, score: this.score(meal, dayIndex) }))
+      .sort((a, b) => b.score - a.score);
+
+    const top = ranked.slice(0, Math.min(5, ranked.length));
+    return top[Math.floor(Math.random() * top.length)].meal.name;
   }
-}
-
-/* =========================
-   LEARNING
-========================= */
+};
 
 const Learn = {
-
-  select(meal){
-    const s = State.data
-    s.likes[meal] = (s.likes[meal]||0)+1
-    s.usage[meal] = (s.usage[meal]||0)+1
+  choose(mealName) {
+    this.use(mealName);
+    State.data.likes[mealName] = (State.data.likes[mealName] || 0) + 1;
   },
 
-  reroll(meal){
-    const s = State.data
-    s.avoids[meal] = (s.avoids[meal]||0)+1
+  use(mealName) {
+    State.data.usage[mealName] = (State.data.usage[mealName] || 0) + 1;
+  },
+
+  reroll(mealName) {
+    State.data.avoids[mealName] = (State.data.avoids[mealName] || 0) + 1;
+  }
+};
+
+let activeDay = null;
+let returnFocusDay = null;
+let undoState = null;
+let toastTimer = null;
+
+function freshWeek() {
+  return Array.from({ length: 7 }, () => ({ meal: null, locked: false }));
+}
+
+function createPlan(week = freshWeek(), options = {}) {
+  return {
+    id: options.id || `plan-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    createdAt: options.createdAt || new Date().toISOString(),
+    week: normalizeWeek(week)
+  };
+}
+
+function normalizeWeek(week) {
+  const source = Array.isArray(week) ? week : [];
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = isPlainObject(source[index]) ? source[index] : {};
+    return {
+      meal: typeof day.meal === "string" && day.meal.trim() ? day.meal : null,
+      locked: Boolean(day.locked)
+    };
+  });
+}
+
+function ensurePlans() {
+  if (!Array.isArray(State.data.plans) || !State.data.plans.length) {
+    State.data.plans = [createPlan()];
+  }
+
+  if (!Number.isInteger(State.data.currentPlanIndex)) {
+    State.data.currentPlanIndex = 0;
+  }
+
+  State.data.currentPlanIndex = Math.max(
+    0,
+    Math.min(State.data.currentPlanIndex, State.data.plans.length - 1)
+  );
+}
+
+function currentPlan() {
+  ensurePlans();
+  return State.data.plans[State.data.currentPlanIndex];
+}
+
+function currentWeek() {
+  return currentPlan().week;
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function normalizeScores(scores) {
+  if (!isPlainObject(scores)) return {};
+  return Object.fromEntries(
+    Object.entries(scores)
+      .filter(([key, value]) => typeof key === "string" && Number.isFinite(Number(value)))
+      .map(([key, value]) => [key, Number(value)])
+  );
+}
+
+function normalizeState(value) {
+  const next = {
+    plans: [createPlan()],
+    currentPlanIndex: 0,
+    usage: {},
+    likes: {},
+    avoids: {},
+    filters: []
+  };
+
+  if (!isPlainObject(value)) return next;
+
+  if (Array.isArray(value.plans) && value.plans.length) {
+    const plans = value.plans
+      .map((plan, index) => {
+        if (!isPlainObject(plan)) return null;
+        return createPlan(plan.week, {
+          id: typeof plan.id === "string" && plan.id ? plan.id : `plan-${index + 1}`,
+          createdAt: typeof plan.createdAt === "string" ? plan.createdAt : null
+        });
+      })
+      .filter(Boolean);
+
+    if (plans.length) next.plans = plans;
+  } else {
+    next.plans = [createPlan(value.week, { id: "plan-1" })];
+  }
+
+  const requestedIndex = Number(value.currentPlanIndex);
+  if (Number.isInteger(requestedIndex)) {
+    next.currentPlanIndex = Math.max(0, Math.min(requestedIndex, next.plans.length - 1));
+  }
+
+  next.usage = normalizeScores(value.usage);
+  next.likes = normalizeScores(value.likes);
+  next.avoids = normalizeScores(value.avoids);
+  next.filters = Array.isArray(value.filters)
+    ? value.filters.filter((filter) => FILTERS.includes(filter))
+    : [];
+
+  return next;
+}
+
+function cloneData() {
+  if ("structuredClone" in window) return structuredClone(State.data);
+  return JSON.parse(JSON.stringify(State.data));
+}
+
+function mealInfo(mealName) {
+  if (!mealName) return null;
+  return MEAL_BY_NAME.get(mealName) || {
+    name: mealName,
+    tags: ["Custom"],
+    details: "Saved meal"
+  };
+}
+
+function icon(name) {
+  return ICONS[name] || "";
+}
+
+function setButtonContent(button, iconName, text) {
+  button.innerHTML = icon(iconName);
+  if (text) {
+    const span = document.createElement("span");
+    span.textContent = text;
+    button.appendChild(span);
   }
 }
 
-/* =========================
-   UI
-========================= */
-
-let activeDay=null
-
-function render(){
-  const grid=document.getElementById("grid")
-  grid.innerHTML=""
-
-  State.data.week.forEach((d,i)=>{
-
-    const el=document.createElement("div")
-    el.className="day" + (d.locked?" locked":"")
-    el.onclick=()=>openModal(i)
-
-    el.innerHTML=`
-      <h4>Day ${i+1}</h4>
-      <div class="meal">${d.meal||""}</div>
-      <div class="icons">
-        <button onclick="reroll(${i});event.stopPropagation()">↻</button>
-        <button onclick="toggleLock(${i});event.stopPropagation()">🔒</button>
-      </div>
-    `
-
-    grid.appendChild(el)
-  })
+function makeIconButton(iconName, label, onClick, options = {}) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = options.className || "icon-button";
+  button.innerHTML = icon(iconName);
+  button.setAttribute("aria-label", label);
+  button.title = label;
+  if (options.pressed !== undefined) button.setAttribute("aria-pressed", String(options.pressed));
+  if (options.disabled) button.disabled = true;
+  button.addEventListener("click", onClick);
+  return button;
 }
 
-function openModal(i){
-  activeDay=i
+function render() {
+  renderSummary();
 
-  const content=document.getElementById("modalContent")
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
 
-  const suggestions = getSuggestions(i)
+  currentWeek().forEach((day, index) => {
+    const meal = mealInfo(day.meal);
+    const dayLabel = DAYS[index];
+    const section = document.createElement("section");
+    section.className = `day${day.locked ? " locked" : ""}`;
 
-  content.innerHTML=`
-    <div class="chips">
-      ${["Comfort","Quick","Italian","Asian","Mexican"].map(f=>`
-        <div class="chip ${State.data.filters.includes(f)?"active":""}"
-             onclick="toggleFilter('${f}')">
-          ${f}
-        </div>
-      `).join("")}
-    </div>
+    const top = document.createElement("div");
+    top.className = "day-top";
 
-    ${suggestions.map(m=>`
-      <div class="suggestion" onclick="selectMeal('${m}')">
-        ${m}
-      </div>
-    `).join("")}
+    const title = document.createElement("h2");
+    title.textContent = dayLabel.short;
 
-    <div class="footer-actions">
-      <button class="small-btn" onclick="clearDay()">Clear</button>
-      <button class="small-btn" onclick="closeModal()">Done</button>
-    </div>
-  `
+    const actions = document.createElement("div");
+    actions.className = "day-actions";
+    actions.append(
+      makeIconButton(
+        "refresh",
+        day.locked ? `${dayLabel.long} is locked` : `Reroll ${dayLabel.long}`,
+        (event) => {
+          event.stopPropagation();
+          reroll(index);
+        },
+        { disabled: day.locked }
+      ),
+      makeIconButton(
+        day.locked ? "lock" : "unlock",
+        `${day.locked ? "Unlock" : "Lock"} ${dayLabel.long}`,
+        (event) => {
+          event.stopPropagation();
+          toggleLock(index);
+        },
+        { pressed: day.locked }
+      )
+    );
 
-  document.getElementById("modal").classList.add("show")
+    top.append(title, actions);
+
+    const main = document.createElement("button");
+    main.type = "button";
+    main.id = `dayOpen${index}`;
+    main.className = "day-main";
+    main.setAttribute(
+      "aria-label",
+      day.meal ? `Open ${dayLabel.long}: ${day.meal}` : `Choose a meal for ${dayLabel.long}`
+    );
+    main.addEventListener("click", () => openModal(index));
+
+    if (meal) {
+      const mealTitle = document.createElement("div");
+      mealTitle.className = "meal-title";
+      mealTitle.textContent = meal.name;
+
+      const side = document.createElement("div");
+      side.className = "side";
+      side.textContent = meal.details;
+
+      main.append(mealTitle, side);
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.innerHTML = icon("plus");
+      const emptyText = document.createElement("span");
+      emptyText.textContent = "Choose meal";
+      empty.appendChild(emptyText);
+      main.appendChild(empty);
+    }
+
+    const tagRow = document.createElement("div");
+    tagRow.className = "tag-row";
+
+    if (day.locked) {
+      tagRow.append(makeTag("Locked", "locked-tag"));
+    }
+
+    if (meal) {
+      meal.tags.slice(0, day.locked ? 1 : 2).forEach((tag) => tagRow.append(makeTag(tag)));
+    }
+
+    section.append(top, main, tagRow);
+    grid.appendChild(section);
+  });
 }
 
-function getSuggestions(i){
+function renderSummary() {
+  const week = currentWeek();
+  const planned = week.filter((day) => day.meal).length;
+  const locked = week.filter((day) => day.locked).length;
+  const planNumber = State.data.currentPlanIndex + 1;
+  const planCount = State.data.plans.length;
+  const previousButton = document.getElementById("prevPlanBtn");
+  const nextButton = document.getElementById("nextPlanBtn");
 
-  let pool = meals
+  document.getElementById("summaryCount").textContent = `${planned} of 7 planned`;
+  document.getElementById("summaryDetail").textContent =
+    locked > 0 ? `${locked} locked` : "Flexible 7-day cycle";
+  document.getElementById("planPosition").textContent = `Plan ${planNumber} of ${planCount}`;
 
-  const filters = State.data.filters
-  if(filters.length){
-    pool = pool.filter(m=>filters.some(f=>m.includes(f)))
+  previousButton.disabled = State.data.currentPlanIndex === 0;
+  nextButton.setAttribute(
+    "aria-label",
+    State.data.currentPlanIndex < planCount - 1 ? "Next plan" : "Create next plan"
+  );
+  setButtonContent(
+    nextButton,
+    State.data.currentPlanIndex < planCount - 1 ? "chevronRight" : "plus",
+    State.data.currentPlanIndex < planCount - 1 ? "Next" : "New Plan"
+  );
+}
+
+function makeTag(text, extraClass = "") {
+  const tag = document.createElement("span");
+  tag.className = `tag ${extraClass}`.trim();
+  tag.textContent = text;
+  return tag;
+}
+
+function openModal(index) {
+  activeDay = index;
+  returnFocusDay = index;
+  renderModalContent();
+
+  const backdrop = document.getElementById("backdrop");
+  backdrop.hidden = false;
+  document.body.classList.add("modal-open");
+  requestAnimationFrame(() => backdrop.classList.add("show"));
+
+  window.setTimeout(() => {
+    const closeButton = document.getElementById("sheetClose");
+    if (closeButton) closeButton.focus();
+  }, 60);
+}
+
+function closeModal() {
+  const backdrop = document.getElementById("backdrop");
+  const dayToFocus = returnFocusDay;
+
+  backdrop.classList.remove("show");
+  activeDay = null;
+  returnFocusDay = null;
+  document.body.classList.remove("modal-open");
+
+  window.setTimeout(() => {
+    if (!backdrop.classList.contains("show")) backdrop.hidden = true;
+    const focusTarget = dayToFocus !== null ? document.getElementById(`dayOpen${dayToFocus}`) : null;
+    if (focusTarget) focusTarget.focus();
+  }, 190);
+}
+
+function renderModalContent() {
+  if (activeDay === null) return;
+
+  const day = currentWeek()[activeDay];
+  const dayLabel = DAYS[activeDay];
+  const meal = mealInfo(day.meal);
+  const modal = document.getElementById("modal");
+  modal.innerHTML = "";
+
+  const handle = document.createElement("div");
+  handle.className = "handle";
+
+  const header = document.createElement("div");
+  header.className = "sheet-header";
+
+  const heading = document.createElement("div");
+  const kicker = document.createElement("p");
+  kicker.className = "sheet-kicker";
+  kicker.textContent = dayLabel.long;
+
+  const title = document.createElement("h2");
+  title.id = "modalTitle";
+  title.textContent = day.locked ? "Locked meal" : "Choose meal";
+
+  heading.append(kicker, title);
+
+  const closeButton = makeIconButton("close", "Close meal picker", closeModal, {
+    className: "icon-button",
+  });
+  closeButton.id = "sheetClose";
+
+  header.append(heading, closeButton);
+  modal.append(handle, header);
+
+  if (day.locked) {
+    renderLockedContent(modal, meal);
+    return;
+  }
+
+  const chips = document.createElement("div");
+  chips.className = "chips";
+  FILTERS.forEach((filter) => {
+    const chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.textContent = filter;
+    chip.setAttribute("aria-pressed", String(State.data.filters.includes(filter)));
+    chip.addEventListener("click", () => toggleFilter(filter));
+    chips.appendChild(chip);
+  });
+  modal.appendChild(chips);
+
+  const suggestions = getSuggestions(activeDay);
+  if (suggestions.length) {
+    const list = document.createElement("div");
+    list.className = "suggestion-list";
+    suggestions.forEach((suggestion) => list.appendChild(makeSuggestionButton(suggestion)));
+    modal.appendChild(list);
+  } else {
+    const empty = document.createElement("div");
+    empty.className = "empty-results";
+    const strong = document.createElement("strong");
+    strong.textContent = "No meals match those filters";
+    const span = document.createElement("span");
+    span.textContent = "Clear filters to see the full meal list.";
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "button secondary";
+    clear.textContent = "Clear filters";
+    clear.addEventListener("click", clearFilters);
+    empty.append(strong, span, clear);
+    modal.appendChild(empty);
+  }
+
+  const footer = document.createElement("div");
+  footer.className = "footer-actions";
+
+  const clear = document.createElement("button");
+  clear.type = "button";
+  clear.className = "button danger";
+  clear.disabled = !day.meal;
+  setButtonContent(clear, "trash", "Clear");
+  clear.addEventListener("click", clearDay);
+
+  const done = document.createElement("button");
+  done.type = "button";
+  done.className = "button secondary";
+  setButtonContent(done, "check", "Done");
+  done.addEventListener("click", closeModal);
+
+  footer.append(clear, done);
+  modal.appendChild(footer);
+}
+
+function renderLockedContent(modal, meal) {
+  const panel = document.createElement("div");
+  panel.className = "locked-panel";
+  panel.innerHTML = icon("lock");
+
+  const copy = document.createElement("div");
+  const strong = document.createElement("strong");
+  strong.textContent = meal ? meal.name : "No meal selected";
+  const span = document.createElement("span");
+  span.textContent = "Unlock this day before changing it.";
+  copy.append(strong, span);
+  panel.appendChild(copy);
+  modal.appendChild(panel);
+
+  const footer = document.createElement("div");
+  footer.className = "footer-actions";
+
+  const unlock = document.createElement("button");
+  unlock.type = "button";
+  unlock.className = "button";
+  setButtonContent(unlock, "unlock", "Unlock");
+  unlock.addEventListener("click", () => toggleLock(activeDay));
+
+  const done = document.createElement("button");
+  done.type = "button";
+  done.className = "button secondary";
+  setButtonContent(done, "check", "Done");
+  done.addEventListener("click", closeModal);
+
+  footer.append(unlock, done);
+  modal.appendChild(footer);
+}
+
+function makeSuggestionButton(meal) {
+  const button = document.createElement("button");
+  const plannedElsewhere = currentWeek().some(
+    (day, index) => index !== activeDay && day.meal === meal.name
+  );
+
+  button.type = "button";
+  button.className = "suggestion";
+  button.addEventListener("click", () => selectMeal(meal.name));
+
+  const copy = document.createElement("div");
+  const name = document.createElement("span");
+  name.className = "suggestion-name";
+  name.textContent = meal.name;
+  const details = document.createElement("span");
+  details.className = "side";
+  details.textContent = meal.details;
+  copy.append(name, details);
+
+  const tags = document.createElement("div");
+  tags.className = "suggestion-tags";
+  if (plannedElsewhere) tags.append(makeTag("Planned", "planned-tag"));
+  meal.tags.slice(0, 3).forEach((tag) => tags.append(makeTag(tag)));
+
+  button.append(copy, tags);
+  return button;
+}
+
+function getSuggestions(dayIndex) {
+  const filters = State.data.filters;
+  let pool = MEAL_CATALOG;
+
+  if (filters.length) {
+    pool = pool.filter((meal) => filters.every((filter) => meal.tags.includes(filter)));
   }
 
   return pool
-    .map(m=>({m,score:Engine.score(m,i)}))
-    .sort((a,b)=>b.score-a.score)
-    .slice(0,6)
-    .map(x=>x.m)
+    .map((meal) => ({ meal, score: Engine.score(meal, dayIndex) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8)
+    .map((item) => item.meal);
 }
 
-/* =========================
-   ACTIONS
-========================= */
+async function fillEmptyDays() {
+  const previous = cloneData();
+  let changed = 0;
 
-async function autoPopulate(){
-  State.data.week.forEach((d,i)=>{
-    if(!d.locked && !d.meal){
-      d.meal = Engine.pick(i)
-      Learn.select(d.meal)
+  currentWeek().forEach((day, index) => {
+    if (!day.locked && !day.meal) {
+      const pick = Engine.pick(index);
+      day.meal = pick;
+      Learn.use(pick);
+      changed += 1;
     }
-  })
+  });
 
-  await State.save()
-  render()
+  if (!changed) {
+    showToast("No empty unlocked days", null);
+    return;
+  }
+
+  await State.save();
+  render();
+  showToast(`${changed} day${changed === 1 ? "" : "s"} filled`, previous);
 }
 
-async function selectMeal(m){
-  State.data.week[activeDay].meal=m
-  Learn.select(m)
-  await State.save()
-  closeModal()
-  render()
+async function regenerateWeek() {
+  const week = currentWeek();
+  const unlocked = week.filter((day) => !day.locked).length;
+  if (!unlocked) {
+    showToast("All days are locked", null);
+    return;
+  }
+
+  const filledUnlocked = week.filter((day) => !day.locked && day.meal).length;
+  if (filledUnlocked && !window.confirm("Replace all unlocked meals? Locked days stay unchanged.")) {
+    return;
+  }
+
+  const previous = cloneData();
+
+  week.forEach((day) => {
+    if (!day.locked) day.meal = null;
+  });
+
+  week.forEach((day, index) => {
+    if (!day.locked) {
+      const pick = Engine.pick(index);
+      day.meal = pick;
+      Learn.use(pick);
+    }
+  });
+
+  await State.save();
+  render();
+  showToast("Unlocked days regenerated", previous);
 }
 
-async function reroll(i){
-  const old = State.data.week[i].meal
-  if(old) Learn.reroll(old)
+async function selectMeal(mealName) {
+  if (activeDay === null) return;
+  if (currentWeek()[activeDay].locked) {
+    showToast(`${DAYS[activeDay].long} is locked`, null);
+    return;
+  }
 
-  State.data.week[i].meal = Engine.pick(i)
-  await State.save()
-  render()
+  const previous = cloneData();
+  const label = DAYS[activeDay].long;
+  currentWeek()[activeDay].meal = mealName;
+  Learn.choose(mealName);
+
+  await State.save();
+  closeModal();
+  render();
+  showToast(`${label} updated`, previous);
 }
 
-async function clearDay(){
-  State.data.week[activeDay]={meal:null,locked:false}
-  await State.save()
-  closeModal()
-  render()
+async function reroll(index) {
+  const day = currentWeek()[index];
+  if (day.locked) {
+    showToast(`${DAYS[index].long} is locked`, null);
+    return;
+  }
+
+  const previous = cloneData();
+  const oldMeal = day.meal;
+  if (oldMeal) Learn.reroll(oldMeal);
+
+  const nextMeal = Engine.pick(index, [oldMeal]);
+  day.meal = nextMeal;
+  Learn.use(nextMeal);
+
+  await State.save();
+  render();
+  showToast(`${DAYS[index].long} rerolled`, previous);
 }
 
-function toggleLock(i){
-  State.data.week[i].locked=!State.data.week[i].locked
-  State.save()
-  render()
+async function clearDay() {
+  if (activeDay === null) return;
+  if (currentWeek()[activeDay].locked) {
+    showToast(`${DAYS[activeDay].long} is locked`, null);
+    return;
+  }
+
+  const previous = cloneData();
+  const label = DAYS[activeDay].long;
+  currentWeek()[activeDay] = { meal: null, locked: false };
+
+  await State.save();
+  closeModal();
+  render();
+  showToast(`${label} cleared`, previous);
 }
 
-function toggleFilter(f){
-  const s=State.data
-  s.filters = s.filters.includes(f)
-    ? s.filters.filter(x=>x!==f)
-    : [...s.filters,f]
-
-  openModal(activeDay)
+async function toggleLock(index) {
+  if (index === null) return;
+  currentWeek()[index].locked = !currentWeek()[index].locked;
+  await State.save();
+  render();
+  if (activeDay === index) renderModalContent();
 }
 
-/* =========================
-   MODAL
-========================= */
+async function toggleFilter(filter) {
+  const filters = State.data.filters;
+  State.data.filters = filters.includes(filter)
+    ? filters.filter((item) => item !== filter)
+    : [...filters, filter];
 
-function closeModal(){
-  document.getElementById("modal").classList.remove("show")
+  await State.save();
+  renderModalContent();
 }
 
-/* =========================
-   EXPORT
-========================= */
-
-function exportData(){
-  const blob = new Blob(
-    [JSON.stringify(State.data)],
-    {type:"application/json"}
-  )
-
-  const a=document.createElement("a")
-  a.href=URL.createObjectURL(blob)
-  a.download="meal-plan-backup.json"
-  a.click()
+async function clearFilters() {
+  State.data.filters = [];
+  await State.save();
+  renderModalContent();
 }
 
-/* =========================
-   FIXED PWA (IMPORTANT CHANGE)
-   - removed blob service worker (was breaking GitHub Pages)
-========================= */
+async function previousPlan() {
+  ensurePlans();
+  if (State.data.currentPlanIndex === 0) return;
 
-function registerPWA(){
-  if(!('serviceWorker' in navigator)) return;
-
-  navigator.serviceWorker.register('./sw.js')
-    .catch(err=>console.log('SW failed',err))
+  closeModal();
+  State.data.currentPlanIndex -= 1;
+  await State.save();
+  render();
 }
 
-/* =========================
-   INIT
-========================= */
+async function nextPlan() {
+  ensurePlans();
+  closeModal();
 
-(async function init(){
-  await Storage.open()
-  await State.load()
-  render()
-  registerPWA()
-})()
+  if (State.data.currentPlanIndex < State.data.plans.length - 1) {
+    State.data.currentPlanIndex += 1;
+    await State.save();
+    render();
+    return;
+  }
 
+  const previous = cloneData();
+  State.data.plans.push(createPlan());
+  State.data.currentPlanIndex = State.data.plans.length - 1;
+  await State.save();
+  render();
+  showToast("New plan created", previous);
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(State.data, null, 2)], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "meal-plan-backup.json";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function triggerImport() {
+  document.getElementById("importInput").click();
+}
+
+async function importData(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  try {
+    const previous = cloneData();
+    const parsed = JSON.parse(await file.text());
+    State.data = normalizeState(parsed);
+    await State.save();
+    render();
+    closeModal();
+    showToast("Backup imported", previous);
+  } catch (error) {
+    console.error(error);
+    showToast("Import failed", null);
+  } finally {
+    event.target.value = "";
+  }
+}
+
+function showToast(message, previous) {
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toastMessage");
+  const undoButton = document.getElementById("undoBtn");
+
+  undoState = previous;
+  toastMessage.textContent = message;
+  undoButton.hidden = !previous;
+  toast.hidden = false;
+
+  window.clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => {
+    toast.hidden = true;
+    undoState = null;
+  }, 5200);
+}
+
+async function undoLast() {
+  if (!undoState) return;
+
+  State.data = cloneDataFrom(undoState);
+  undoState = null;
+  await State.save();
+  render();
+  if (activeDay !== null) renderModalContent();
+  document.getElementById("toast").hidden = true;
+}
+
+function cloneDataFrom(value) {
+  if ("structuredClone" in window) return structuredClone(value);
+  return JSON.parse(JSON.stringify(value));
+}
+
+function trapModalFocus(event) {
+  const backdrop = document.getElementById("backdrop");
+  if (backdrop.hidden) return;
+
+  if (event.key === "Escape") {
+    event.preventDefault();
+    closeModal();
+    return;
+  }
+
+  if (event.key !== "Tab") return;
+
+  const focusable = Array.from(
+    document.getElementById("modal").querySelectorAll(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+  );
+
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
+function attachEvents() {
+  setButtonContent(document.getElementById("fillEmptyBtn"), "plus", "Fill Empty");
+  setButtonContent(document.getElementById("regenerateBtn"), "refresh", "Regenerate");
+  document.getElementById("prevPlanBtn").innerHTML = icon("chevronLeft");
+  document.getElementById("importBtn").innerHTML = icon("upload");
+  document.getElementById("exportBtn").innerHTML = icon("download");
+
+  document.getElementById("fillEmptyBtn").addEventListener("click", fillEmptyDays);
+  document.getElementById("regenerateBtn").addEventListener("click", regenerateWeek);
+  document.getElementById("prevPlanBtn").addEventListener("click", previousPlan);
+  document.getElementById("nextPlanBtn").addEventListener("click", nextPlan);
+  document.getElementById("importBtn").addEventListener("click", triggerImport);
+  document.getElementById("exportBtn").addEventListener("click", exportData);
+  document.getElementById("importInput").addEventListener("change", importData);
+  document.getElementById("undoBtn").addEventListener("click", undoLast);
+
+  document.getElementById("backdrop").addEventListener("click", (event) => {
+    if (event.target.id === "backdrop") closeModal();
+  });
+
+  document.addEventListener("keydown", trapModalFocus);
+}
+
+(async function init() {
+  attachEvents();
+  await State.load();
+  render();
+})();
 </script>
-
 </body>
 </html>
